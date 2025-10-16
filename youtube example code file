@@ -1,0 +1,256 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { ThumbsUp, ThumbsDown, MessageCircle, Share2, MoreVertical, Volume2, VolumeX } from 'lucide-react';
+
+const VideoShort = ({ video, isActive }) => {
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isActive) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isActive]);
+
+  const handleLike = () => {
+    setLiked(!liked);
+    if (disliked) setDisliked(false);
+  };
+
+  const handleDislike = () => {
+    setDisliked(!disliked);
+    if (liked) setLiked(false);
+  };
+
+  return (
+    <div className="relative w-full h-full bg-black flex items-center justify-center">
+      {/* Video Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-pink-900 flex items-center justify-center">
+        <div className="text-white text-6xl font-bold opacity-20">
+          {video.title}
+        </div>
+      </div>
+
+      {/* Video Info Overlay */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+        <div className="flex items-start gap-3">
+          <img 
+            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${video.channel}`} 
+            alt={video.channel}
+            className="w-10 h-10 rounded-full"
+          />
+          <div className="flex-1">
+            <p className="text-white font-semibold text-sm">{video.channel}</p>
+            <p className="text-white text-xs mt-1 line-clamp-2">{video.description}</p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-xs text-gray-300">#{video.hashtag}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="absolute right-2 bottom-20 flex flex-col gap-4">
+        <button 
+          onClick={handleLike}
+          className="flex flex-col items-center gap-1 group"
+        >
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+            liked ? 'bg-red-500' : 'bg-gray-800/70 hover:bg-gray-700/70'
+          }`}>
+            <ThumbsUp className={`w-6 h-6 ${liked ? 'text-white fill-white' : 'text-white'}`} />
+          </div>
+          <span className="text-white text-xs font-semibold">{video.likes + (liked ? 1 : 0)}K</span>
+        </button>
+
+        <button 
+          onClick={handleDislike}
+          className="flex flex-col items-center gap-1 group"
+        >
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+            disliked ? 'bg-gray-600' : 'bg-gray-800/70 hover:bg-gray-700/70'
+          }`}>
+            <ThumbsDown className={`w-6 h-6 ${disliked ? 'text-white fill-white' : 'text-white'}`} />
+          </div>
+          <span className="text-white text-xs font-semibold">Dislike</span>
+        </button>
+
+        <button className="flex flex-col items-center gap-1 group">
+          <div className="w-12 h-12 rounded-full bg-gray-800/70 hover:bg-gray-700/70 flex items-center justify-center transition-all">
+            <MessageCircle className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-white text-xs font-semibold">{video.comments}</span>
+        </button>
+
+        <button className="flex flex-col items-center gap-1 group">
+          <div className="w-12 h-12 rounded-full bg-gray-800/70 hover:bg-gray-700/70 flex items-center justify-center transition-all">
+            <Share2 className="w-6 h-6 text-white" />
+          </div>
+          <span className="text-white text-xs font-semibold">Share</span>
+        </button>
+
+        <button className="flex flex-col items-center gap-1 group">
+          <div className="w-12 h-12 rounded-full bg-gray-800/70 hover:bg-gray-700/70 flex items-center justify-center transition-all">
+            <MoreVertical className="w-6 h-6 text-white" />
+          </div>
+        </button>
+      </div>
+
+      {/* Mute Button */}
+      <button 
+        onClick={() => setMuted(!muted)}
+        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-800/70 hover:bg-gray-700/70 flex items-center justify-center transition-all"
+      >
+        {muted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+      </button>
+    </div>
+  );
+};
+
+export default function YoutubeShortsClone() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  const videos = [
+    {
+      id: 1,
+      title: "VIDEO 1",
+      channel: "TechCreator",
+      description: "Amazing new tech gadget review! You won't believe what this can do 🔥",
+      likes: 45.2,
+      comments: "1.2K",
+      hashtag: "tech",
+    },
+    {
+      id: 2,
+      title: "VIDEO 2",
+      channel: "FitnessGuru",
+      description: "30-second abs workout that actually works! Try this daily routine",
+      likes: 89.5,
+      comments: "2.8K",
+      hashtag: "fitness",
+    },
+    {
+      id: 3,
+      title: "VIDEO 3",
+      channel: "FoodieChannel",
+      description: "The easiest pasta recipe you'll ever make! Only 3 ingredients needed",
+      likes: 124.8,
+      comments: "4.5K",
+      hashtag: "cooking",
+    },
+    {
+      id: 4,
+      title: "VIDEO 4",
+      channel: "TravelVlogs",
+      description: "Hidden gem in Bali that tourists don't know about 🌴",
+      likes: 67.3,
+      comments: "1.9K",
+      hashtag: "travel",
+    },
+    {
+      id: 5,
+      title: "VIDEO 5",
+      channel: "ComedySkits",
+      description: "When your code finally works after 3 hours 😂",
+      likes: 156.7,
+      comments: "5.2K",
+      hashtag: "comedy",
+    },
+  ];
+
+  const handleTouchStart = (e) => {
+    setTouchStart(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = () => {
+    if (isScrolling) return;
+    
+    if (touchStart - touchEnd > 50 && currentIndex < videos.length - 1) {
+      setIsScrolling(true);
+      setCurrentIndex(currentIndex + 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    }
+    if (touchStart - touchEnd < -50 && currentIndex > 0) {
+      setIsScrolling(true);
+      setCurrentIndex(currentIndex - 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    }
+  };
+
+  const handleWheel = (e) => {
+    if (isScrolling) return;
+    
+    e.preventDefault();
+    
+    if (e.deltaY > 0 && currentIndex < videos.length - 1) {
+      setIsScrolling(true);
+      setCurrentIndex(currentIndex + 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    } else if (e.deltaY < 0 && currentIndex > 0) {
+      setIsScrolling(true);
+      setCurrentIndex(currentIndex - 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    }
+  };
+
+  return (
+    <div className="relative w-full h-screen bg-black overflow-hidden">
+      {/* Header */}
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/50 to-transparent">
+        <div className="flex gap-6 text-white">
+          <button className="text-sm font-semibold opacity-60 hover:opacity-100">Following</button>
+          <button className="text-sm font-semibold border-b-2 border-white">For You</button>
+        </div>
+        <div className="text-white text-xl font-bold">Shorts</div>
+        <div className="w-8"></div>
+      </div>
+
+      {/* Video Container */}
+      <div 
+        className="relative w-full h-full transition-transform duration-300"
+        style={{ transform: `translateY(-${currentIndex * 100}%)` }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onWheel={handleWheel}
+      >
+        {videos.map((video, index) => (
+          <div key={video.id} className="w-full h-screen">
+            <VideoShort video={video} isActive={index === currentIndex} />
+          </div>
+        ))}
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="absolute top-16 right-4 flex flex-col gap-1">
+        {videos.map((_, index) => (
+          <div
+            key={index}
+            className={`w-1 h-8 rounded-full transition-all ${
+              index === currentIndex ? 'bg-white' : 'bg-white/30'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Swipe Hint */}
+      {currentIndex === 0 && (
+        <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 text-white text-sm opacity-50 animate-bounce">
+          Swipe up or scroll ↑
+        </div>
+      )}
+    </div>
+  );
+}
