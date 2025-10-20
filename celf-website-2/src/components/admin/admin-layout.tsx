@@ -129,7 +129,35 @@ const sidebarItems = [
     title: 'Content',
     href: '/admin/content',
     icon: FileText,
-    description: 'Content management',
+    description: 'Content overview',
+    category: 'management'
+  },
+  {
+    title: 'Contact Forms',
+    href: '/admin/content/contact',
+    icon: FileText,
+    description: 'Manage contact submissions',
+    category: 'management'
+  },
+  {
+    title: 'Newsletter',
+    href: '/admin/content/newsletter',
+    icon: FileText,
+    description: 'Newsletter subscriptions',
+    category: 'management'
+  },
+  {
+    title: 'Mentorship',
+    href: '/admin/content/mentorship',
+    icon: FileText,
+    description: 'Mentorship applications',
+    category: 'management'
+  },
+  {
+    title: 'Scholarships',
+    href: '/admin/content/scholarships',
+    icon: FileText,
+    description: 'Scholarship applications',
     category: 'management'
   },
   {

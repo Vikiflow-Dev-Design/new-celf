@@ -27,10 +27,18 @@ export interface AuthResponse {
   validationErrors?: string[];
 }
 
+export interface FieldError {
+  field: string;
+  message: string;
+  value?: any;
+}
+
 export interface ApiError {
   success: false;
   message: string;
   validationErrors?: string[];
+  fieldErrors?: FieldError[];
+  status?: number;
 }
 
 /**
@@ -69,7 +77,15 @@ async function apiRequest<T>(
     console.log(`📡 API Response (${response.status}):`, data);
 
     if (!response.ok) {
-      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      const fieldErrors = Array.isArray(data?.meta?.errors) ? data.meta.errors : [];
+      const errorObj: ApiError = {
+        success: false,
+        message: data?.message || `Request failed (${response.status})`,
+        validationErrors: fieldErrors.length ? fieldErrors.map((e: any) => `${e.field}: ${e.message}`) : undefined,
+        fieldErrors,
+        status: response.status,
+      };
+      throw errorObj as any;
     }
 
     return data;
@@ -250,4 +266,46 @@ export const retryRequest = async <T>(
   }
   
   throw lastError;
+};
+
+export interface MentorApplicationPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  education: string;
+  experience: string;
+  expertise: string[];
+  availability: Record<string, any>;
+  motivation: string;
+  linkedinProfile?: string;
+  resume?: string; // backend expects 'resume' in validation
+}
+
+export interface MenteeApplicationPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  currentEducation: string;
+  goals: string;
+  interests: string[];
+  availability: Record<string, any>;
+  experience?: string;
+  challenges: string;
+}
+
+export const mentorshipApi = {
+  async applyAsMentor(payload: MentorApplicationPayload): Promise<{ success: boolean; message: string; data: any }>{
+    return apiRequest('/mentorship/apply/mentor', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  async applyAsMentee(payload: MenteeApplicationPayload): Promise<{ success: boolean; message: string; data: any }>{
+    return apiRequest('/mentorship/apply/mentee', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
 };

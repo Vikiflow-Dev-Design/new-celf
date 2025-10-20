@@ -16,6 +16,7 @@ import {
   Calendar,
   Award
 } from "lucide-react";
+import { mentorshipApi, handleApiError } from "@/src/lib/api";
 
 const applicationTypes = [
   {
@@ -89,20 +90,164 @@ export function ApplicationSection() {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const mapBackendToUIField = (field: string, type: "mentee" | "mentor"): string => {
+    switch (field) {
+      case "firstName":
+      case "lastName":
+        return "fullName";
+      case "currentEducation":
+        return "currentLevel";
+      case "interests":
+        return "mentorshipType";
+      default:
+        return field;
+    }
+  };
+
+  const isValidEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const validateForm = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+
+    const fullName = formData.fullName || "";
+    const [fn, ...rest] = fullName.trim().split(" ");
+    const ln = (rest.join(" ") || "").trim();
+    if (fn.length < 2 || ln.length < 2) {
+      errors.fullName = "Enter your full name (first and last, 2+ chars each).";
+    }
+
+    if (!isValidEmail(formData.email || "")) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    const availability = formData.availability || "";
+    if (!availability) {
+      errors.availability = "Please select your availability.";
+    }
+
+    if (selectedType === "mentor") {
+      const expertiseArray = (formData.expertise || "").split(/[\,\n]/).map(s => s.trim()).filter(Boolean);
+      if (!formData.education || formData.education.trim().length < 10) {
+        errors.education = "Please describe your education (10+ characters).";
+      }
+      if (!formData.experience || formData.experience.trim().length < 10) {
+        errors.experience = "Please describe your experience (10+ characters).";
+      }
+      if (expertiseArray.length === 0) {
+        errors.expertise = "Please add at least one area of expertise.";
+      }
+      if (!formData.motivation || formData.motivation.trim().length < 50) {
+        errors.motivation = "Motivation must be at least 50 characters.";
+      }
+    } else {
+      const currentEducationDetailed = [formData.currentLevel, formData.university, formData.fieldOfStudy].filter(Boolean).join(" - ");
+      if (!currentEducationDetailed || currentEducationDetailed.trim().length < 10) {
+        errors.currentLevel = "Please describe your current education (10+ characters).";
+      }
+      if (!formData.goals || formData.goals.trim().length < 50) {
+        errors.goals = "Goals must be at least 50 characters.";
+      }
+      const interests = [formData.fieldOfStudy || "", formData.mentorshipType || ""].filter(Boolean);
+      if (interests.length === 0) {
+        errors.mentorshipType = "Please select a mentorship type or add interests.";
+      }
+      if (!formData.challenges || formData.challenges.trim().length < 20) {
+        errors.challenges = "Challenges must be at least 20 characters.";
+      }
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitted(true);
+    setErrorMessage(null);
+    setFieldErrors({});
+
+    // Client-side validation
+    const preErrors = validateForm();
+    if (Object.keys(preErrors).length > 0) {
+      setFieldErrors(preErrors);
+      setErrorMessage("Please fix the highlighted fields.");
       setIsSubmitting(false);
-    }, 2000);
+      return;
+    }
+
+    try {
+      const fullName = formData.fullName || "";
+      const [firstName, ...rest] = fullName.split(" ");
+      const lastName = rest.join(" ") || "";
+
+      const availabilityObj = { preferred: formData.availability || "Flexible" };
+
+      if (selectedType === "mentor") {
+        const expertiseArray = (formData.expertise || "")
+          .split(/[\,\n]/)
+          .map(s => s.trim())
+          .filter(Boolean);
+
+        const payload = {
+          firstName,
+          lastName,
+          email: formData.email || "",
+          phone: formData.phone || undefined,
+          education: formData.education || "",
+          experience: formData.experience || "",
+          expertise: expertiseArray,
+          availability: availabilityObj,
+          motivation: formData.motivation || "",
+          linkedinProfile: undefined,
+          resume: undefined,
+        };
+
+        await mentorshipApi.applyAsMentor(payload);
+      } else {
+        const interestsArray = [
+          formData.fieldOfStudy || "",
+          formData.mentorshipType || "",
+        ].filter(Boolean);
+
+        const currentEducationDetailed = [formData.currentLevel, formData.university, formData.fieldOfStudy].filter(Boolean).join(" - ");
+
+        const payload = {
+          firstName,
+          lastName,
+          email: formData.email || "",
+          phone: formData.phone || undefined,
+          currentEducation: currentEducationDetailed,
+          goals: formData.goals || "",
+          interests: interestsArray.length ? interestsArray : ["General"],
+          availability: availabilityObj,
+          experience: formData.experience || undefined,
+          challenges: formData.challenges || "",
+        };
+
+        await mentorshipApi.applyAsMentee(payload);
+      }
+
+      setIsSubmitted(true);
+    } catch (error) {
+      setErrorMessage(handleApiError(error));
+      const backendErrors = (error as any)?.fieldErrors || (error as any)?.meta?.errors || [];
+      if (Array.isArray(backendErrors) && backendErrors.length) {
+        const uiErrors: Record<string, string> = {};
+        backendErrors.forEach((err: any) => {
+          const uiField = mapBackendToUIField(err.field, selectedType);
+          uiErrors[uiField] = err.message;
+        });
+        setFieldErrors(uiErrors);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -333,11 +478,17 @@ export function ApplicationSection() {
                           placeholder={`Enter your ${field.label.toLowerCase()}`}
                         />
                       )}
+                      {fieldErrors[field.name] && (
+                        <div className="mt-2 text-xs text-red-400">{fieldErrors[field.name]}</div>
+                      )}
                     </div>
                   ))}
                 </div>
 
                 <div className="border-t border-gray-700/50 pt-6">
+                  {errorMessage && (
+                    <div className="mb-4 text-sm text-red-400">{errorMessage}</div>
+                  )}
                   <div className="flex items-center space-x-2 mb-4">
                     <Shield className="h-5 w-5 text-[#9EFF00]" />
                     <span className="text-sm text-gray-300">Your information is secure and will only be used for mentorship matching.</span>

@@ -6,15 +6,28 @@ class MentorshipController {
     try {
       const applicationData = req.body;
 
-      const mockApplication = {
-        id: 'mock-mentor-application-id',
+      const payload = {
         type: 'mentor',
-        ...applicationData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
+        firstName: applicationData.firstName,
+        lastName: applicationData.lastName,
+        email: (applicationData.email || '').toLowerCase(),
+        phone: applicationData.phone,
+        availability: applicationData.availability,
+        education: applicationData.education,
+        experience: applicationData.experience,
+        expertise: Array.isArray(applicationData.expertise)
+          ? applicationData.expertise
+          : typeof applicationData.expertise === 'string'
+            ? applicationData.expertise.split(',').map(s => s.trim()).filter(Boolean)
+            : [],
+        motivation: applicationData.motivation,
+        linkedinProfile: applicationData.linkedinProfile,
+        resumeUrl: applicationData.resumeUrl || applicationData.resume || undefined,
       };
 
-      res.status(201).json(createResponse(true, 'Mentor application submitted successfully', { application: mockApplication }));
+      const created = await mongodbService.createMentorshipApplication(payload);
+
+      res.status(201).json(createResponse(true, 'Mentor application submitted successfully', { application: created }));
     } catch (error) {
       next(error);
     }
@@ -24,15 +37,27 @@ class MentorshipController {
     try {
       const applicationData = req.body;
 
-      const mockApplication = {
-        id: 'mock-mentee-application-id',
+      const payload = {
         type: 'mentee',
-        ...applicationData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
+        firstName: applicationData.firstName,
+        lastName: applicationData.lastName,
+        email: (applicationData.email || '').toLowerCase(),
+        phone: applicationData.phone,
+        availability: applicationData.availability,
+        currentEducation: applicationData.currentEducation,
+        goals: applicationData.goals,
+        interests: Array.isArray(applicationData.interests)
+          ? applicationData.interests
+          : typeof applicationData.interests === 'string'
+            ? applicationData.interests.split(',').map(s => s.trim()).filter(Boolean)
+            : [],
+        experience: applicationData.experience,
+        challenges: applicationData.challenges,
       };
 
-      res.status(201).json(createResponse(true, 'Mentee application submitted successfully', { application: mockApplication }));
+      const created = await mongodbService.createMentorshipApplication(payload);
+
+      res.status(201).json(createResponse(true, 'Mentee application submitted successfully', { application: created }));
     } catch (error) {
       next(error);
     }
