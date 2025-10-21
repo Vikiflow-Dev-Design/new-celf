@@ -15,6 +15,7 @@ const AdminSettings = require('./AdminSettings');
 const Task = require('./Task');
 const UserTask = require('./UserTask');
 const ExternalLinkSession = require('./ExternalLinkSession');
+const Donation = require('./Donation');
 
 // Note: Additional models to be created:
 // - MentorshipConnection
@@ -36,5 +37,6 @@ module.exports = {
   AdminSettings,
   Task,
   UserTask,
-  ExternalLinkSession
+  ExternalLinkSession,
+  Donation
 };

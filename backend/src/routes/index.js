@@ -18,6 +18,7 @@ const scholarshipRoutes = require('./scholarshipRoutes');
 const adminRoutes = require('./adminRoutes');
 const youtubeRoutes = require('./youtubeRoutes');
 const instagramRoutes = require('./instagramRoutes');
+const donationRoutes = require('./donationRoutes');
 
 // API version and welcome message
 router.get('/', (req, res) => {
@@ -46,6 +47,7 @@ router.get('/', (req, res) => {
       newsletter: '/api/newsletter',
       mentorship: '/api/mentorship',
       scholarship: '/api/scholarship',
+      donations: '/api/donations',
       // Admin endpoints
       admin: '/api/admin',
       // Social media endpoints
@@ -71,6 +73,7 @@ router.use('/contact', contactRoutes);
 router.use('/newsletter', newsletterRoutes);
 router.use('/mentorship', mentorshipRoutes);
 router.use('/scholarship', scholarshipRoutes);
+router.use('/donations', donationRoutes);
 
 // Admin routes
 router.use('/admin', adminRoutes);

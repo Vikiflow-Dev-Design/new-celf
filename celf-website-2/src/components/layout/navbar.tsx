@@ -58,6 +58,10 @@ const navigationItems = [
     ],
   },
   {
+    label: "Donate",
+    href: "/donate",
+  },
+  {
     label: "Contact",
     href: "/contact",
   },
