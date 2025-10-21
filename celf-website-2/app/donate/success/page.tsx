@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 type VerifyResponse = {
@@ -17,7 +17,7 @@ type VerifyResponse = {
   };
 };
 
-export default function DonateSuccessPage() {
+function DonateSuccessPageContent() {
   const searchParams = useSearchParams();
   const reference = useMemo(() => searchParams.get("reference") || "", [searchParams]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -124,5 +124,13 @@ export default function DonateSuccessPage() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function DonateSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-700">Loading…</p></div>}>
+      <DonateSuccessPageContent />
+    </Suspense>
   );
 }
