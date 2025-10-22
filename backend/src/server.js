@@ -81,6 +81,20 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Add a friendly root route for Vercel
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'CELF backend is running',
+    endpoints: {
+      health: '/health',
+      api_root: '/api',
+      donations_initialize: '/api/donations/initialize',
+      donations_verify: '/api/donations/verify/:reference'
+    }
+  });
+});
+
 // API routes
 app.use('/api', routes);
 
