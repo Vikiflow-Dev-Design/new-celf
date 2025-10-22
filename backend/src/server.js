@@ -22,6 +22,9 @@ const allowedOrigins = [
   'http://localhost:19006',   // Alternative Expo web port
   'http://127.0.0.1:8081',    // Alternative localhost format
   'http://127.0.0.1:19006',   // Alternative localhost format
+  // Deployed domains
+  'https://celf-website.vikiflow.com',
+  'https://celf-mobile.vikiflow.com',
   process.env.FRONTEND_URL,   // Custom frontend URL from env
   process.env.MOBILE_URL      // Custom mobile URL from env
 ].filter(Boolean); // Remove undefined values

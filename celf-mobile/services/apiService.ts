@@ -10,7 +10,7 @@ const API_BASE_URL = __DEV__
   ? 'http://localhost:5000/api'  // Development - Expo Web, iOS Simulator
   // ? 'http://10.0.2.2:5000/api'  // Development - Android Emulator
   // ? 'http://YOUR_COMPUTER_IP:5000/api'  // Development - Physical Device
-  : 'https://your-production-api.com/api'; // Production
+  : 'https://celf-backend.vikiflow.com/api'; // Production
 
 const TOKEN_KEY = 'celf_auth_token';
 const REFRESH_TOKEN_KEY = 'celf_refresh_token';
