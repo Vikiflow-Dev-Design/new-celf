@@ -1,14 +1,15 @@
-{
-  "version": 2,
-  "name": "celf-mining-backend",
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs20.x",
-      "memory": 1024,
-      "maxDuration": 10
+    {
+      "version": 2,
+      "builds": [
+        {
+          "src": "src/server.js",
+          "use": "@vercel/node"
+        }
+      ],
+      "routes": [
+        {
+          "src": "/(.*)",
+          "dest": "server.js"
+        }
+      ]
     }
-  },
-  "routes": [
-    { "src": "/api/(.*)", "dest": "api/index.js" }
-  ]
-}
