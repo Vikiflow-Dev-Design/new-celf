@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "celf-mining-backend",
-  "framework": null,
   "functions": {
     "api/index.js": {
       "runtime": "nodejs20.x",
@@ -9,7 +8,7 @@
       "maxDuration": 10
     }
   },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "api/index.js" }
   ]
 }
