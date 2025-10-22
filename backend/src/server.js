@@ -125,7 +125,9 @@ const startServer = async () => {
   }
 };
 
-// Start the server
-startServer();
+// Start the server (skip when running on Vercel)
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 module.exports = app;
