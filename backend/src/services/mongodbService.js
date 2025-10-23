@@ -264,6 +264,20 @@ class MongoDBService {
         throw new Error(`Model ${modelName} not found`);
       }
 
+      // Ensure DB connection is ready (serverless-safe)
+      if (!this.isConnected()) {
+        try {
+          const database = require('../config/database');
+          await database.connect();
+        } catch (e) {
+          // Swallow to proceed to waitForConnection
+        }
+        const connected = await this.waitForConnection(5000);
+        if (!connected) {
+          throw new Error('Database connection not ready');
+        }
+      }
+
       return await Model.countDocuments(filters);
     } catch (error) {
       throw new Error(`Error counting ${modelName}: ${error.message}`);
@@ -946,6 +960,20 @@ class MongoDBService {
       const Model = this.models[modelName];
       if (!Model) {
         throw new Error(`Model ${modelName} not found`);
+      }
+
+      // Ensure DB connection is ready (serverless-safe)
+      if (!this.isConnected()) {
+        try {
+          const database = require('../config/database');
+          await database.connect();
+        } catch (e) {
+          // Swallow to proceed to waitForConnection
+        }
+        const connected = await this.waitForConnection(5000);
+        if (!connected) {
+          throw new Error('Database connection not ready');
+        }
       }
 
       return await Model.aggregate(pipeline);
