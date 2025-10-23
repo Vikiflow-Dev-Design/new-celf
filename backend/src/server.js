@@ -110,31 +110,44 @@ const PORT = config.port || 5000;
 // Initialize database and start server
 const startServer = async () => {
   try {
-    // Try to connect to MongoDB
-    const connection = await database.connect();
+    const MAX_ATTEMPTS = 5;
+    let connection = null;
 
-    if (connection) {
-      console.log('✅ MongoDB connection successful');
-      // Setup event handlers for graceful shutdown
-      database.setupEventHandlers();
-    } else {
-      console.warn('⚠️  Starting server without MongoDB connection');
-      console.warn('⚠️  Some features may not work until database is connected');
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      console.log(`🔄 Connecting to MongoDB (attempt ${attempt}/${MAX_ATTEMPTS})...`);
+      try {
+        // Perform a single connect attempt (server-level retry handles looping)
+        connection = await database.connect(0, 0);
+      } catch (error) {
+        console.error(`❌ MongoDB single attempt failed: ${error.message}`);
+      }
+
+      if (connection) {
+        console.log('✅ MongoDB connection successful');
+        // Setup event handlers for graceful shutdown
+        database.setupEventHandlers();
+        break;
+      } else if (attempt < MAX_ATTEMPTS) {
+        console.warn('⚠️  MongoDB not connected. Retrying in 1 second...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
 
-    // Start server regardless of database connection status
+    if (!connection) {
+      console.error('❌ Failed to connect to MongoDB after 5 attempts. Server will not start.');
+      console.error('   - Check MongoDB Atlas IP whitelist');
+      console.error('   - Verify MONGODB_URI in environment');
+      console.error('   - Confirm network connectivity and DNS for SRV records');
+      process.exit(1);
+      return;
+    }
+
+    // Start server only after successful database connection
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Environment: ${config.nodeEnv}`);
-      console.log(`🗄️  Database: ${connection ? 'MongoDB (Connected)' : 'MongoDB (Disconnected)'}`);
+      console.log(`🗄️  Database: MongoDB (Connected)`);
       console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-
-      if (!connection) {
-        console.log(`⚠️  To fix database connection:`);
-        console.log(`   1. Check MongoDB Atlas IP whitelist`);
-        console.log(`   2. Verify MONGODB_URI in .env file`);
-        console.log(`   3. Check network connectivity`);
-      }
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
