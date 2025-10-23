@@ -445,6 +445,31 @@ class AdminApiService {
     }
   }
 
+  async getTaskById(id: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/tasks/admin/${id}`, {
+        method: 'GET',
+        headers: this.getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API request failed: ${response.status} ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || 'API request failed');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Admin API Error:', error);
+      throw error;
+    }
+  }
+
   async createTask(taskData: any): Promise<ApiResponse<any>> {
     try {
       const response = await fetch(`${API_BASE_URL}/tasks/admin/create`, {

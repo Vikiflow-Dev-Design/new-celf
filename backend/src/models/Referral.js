@@ -91,7 +91,7 @@ referralSchema.index({ referrerId: 1, refereeId: 1 }, { unique: true });
 
 // Virtual for referral link
 referralSchema.virtual('referralLink').get(function() {
-  return `${process.env.APP_URL || 'https://celf.app'}/signup?ref=${this.referralCode}`;
+  return `${process.env.APP_URL || 'https://celf-website.vikiflow.com'}/auth/register?ref=${this.referralCode}`;
 });
 
 // Methods

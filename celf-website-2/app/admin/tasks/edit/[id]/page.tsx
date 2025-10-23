@@ -89,12 +89,9 @@ export default function EditTaskPage() {
       }
 
       console.log('Fetching task with ID:', taskId);
-      const response = await fetch(`http://localhost:5000/api/tasks/admin/${taskId}`);
+      const response = await adminApi.getTaskById(taskId);
       
-      if (!response.ok) throw new Error('Failed to fetch task');
-      
-      const data = await response.json();
-      const taskData = data.data || data;
+      const taskData = response.data;
       
       setTask(taskData);
       setFormData({
@@ -173,29 +170,14 @@ export default function EditTaskPage() {
       };
 
       console.log('Saving task with data:', submitData);
-      const response = await fetch(`http://localhost:5000/api/tasks/admin/${taskId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(submitData)
-      });
+      const response = await adminApi.updateTask(taskId, submitData);
 
-      console.log('Save response status:', response.status);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('Save error response:', errorText);
-        throw new Error(`Failed to update task: ${response.status} ${errorText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         console.log('Task updated successfully');
         alert('Task updated successfully!');
         router.push('/admin/tasks');
       } else {
-        throw new Error(data.message || 'Failed to update task');
+        throw new Error(response.message || 'Failed to update task');
       }
     } catch (err) {
       console.error('Failed to update task:', err);
@@ -214,11 +196,7 @@ export default function EditTaskPage() {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks/admin/${taskId}`, {
-        method: 'DELETE'
-      });
-      
-      if (!response.ok) throw new Error('Failed to delete task');
+      await adminApi.deleteTask(taskId);
       
       console.log('Task deleted successfully');
       router.push('/admin/tasks');

@@ -6,7 +6,7 @@
 import type { TermsSection } from './types';
 
 // Website URLs
-export const WEBSITE_URL = 'https://celf.app';
+export const WEBSITE_URL = 'https://celf-website.vikiflow.com';
 export const TERMS_URL = `${WEBSITE_URL}/terms`;
 
 // Version information

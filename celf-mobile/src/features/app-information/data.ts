@@ -5,7 +5,7 @@
 import { AppInfo, UpdateInfo, WhatsNewItem } from './types';
 
 // Website URL - to be updated when website is created
-export const WEBSITE_URL = 'https://celf.app';
+export const WEBSITE_URL = 'https://celf-website.vikiflow.com';
 export const APP_INFO_URL = `${WEBSITE_URL}/app-info`;
 
 // Mock app information

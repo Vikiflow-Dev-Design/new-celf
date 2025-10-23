@@ -7,7 +7,7 @@ import { Colors } from '@/constants/design-tokens';
 import type { FAQItem, ContactOption } from './types';
 
 // Website URLs
-export const WEBSITE_URL = 'https://celf.app';
+export const WEBSITE_URL = 'https://celf-website.vikiflow.com';
 export const HELP_CENTER_URL = `${WEBSITE_URL}/help`;
 export const CONTACT_URL = `${WEBSITE_URL}/contact`;
 

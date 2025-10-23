@@ -22,7 +22,7 @@ export const EmptyReferrals: React.FC<EmptyReferralsProps> = ({
     try {
       await Share.share({
         message: `Join me on CELF and start mining cryptocurrency! Use my referral code: ${referralCode}`,
-        url: `https://celf.app/invite/${referralCode}`,
+        url: `https://celf-website.vikiflow.com/auth/register?ref=${referralCode}`,
       });
     } catch (error) {
       console.error('Error sharing:', error);

@@ -122,9 +122,10 @@ class ReferralController {
       
       const referralCode = await ReferralService.createReferralCodeForUser(userId);
       
-      res.json(createResponse(true, 'Referral code generated successfully', {
+      const appBaseUrl = process.env.APP_URL || 'https://celf-website.vikiflow.com';
+      res.json(createResponse(true, 'Referral link generated successfully', {
         referralCode,
-        referralLink: `${process.env.APP_URL || 'https://celf.app'}/signup?ref=${referralCode}`
+        referralLink: `${appBaseUrl}/auth/register?ref=${referralCode}`
       }));
     } catch (error) {
       console.error('❌ ReferralController: Error generating referral code:', error);

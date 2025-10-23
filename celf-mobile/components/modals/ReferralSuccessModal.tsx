@@ -75,7 +75,7 @@ export const ReferralSuccessModal: React.FC<ReferralSuccessModalProps> = ({
   const handleShareMore = async () => {
     try {
       await Share.share({
-        message: `Join me on CELF and start mining crypto! Use my referral code to get bonus tokens. Download now: https://celf.app/ref/${referralData.referredUser}`,
+        message: `Join me on CELF and start mining crypto! Use my referral code to get bonus tokens. Register now: https://celf-website.vikiflow.com/auth/register?ref=${referralData.referredUser}`,
         title: 'Join CELF - Crypto Mining App',
       });
       onShareMore?.();

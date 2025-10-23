@@ -6,7 +6,7 @@
 import type { PrivacySection, PrivacyControl } from './types';
 
 // Website URLs
-export const WEBSITE_URL = 'https://celf.app';
+export const WEBSITE_URL = 'https://celf-website.vikiflow.com';
 export const PRIVACY_URL = `${WEBSITE_URL}/privacy`;
 
 // Version information

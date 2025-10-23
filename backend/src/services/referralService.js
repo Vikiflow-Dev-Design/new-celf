@@ -227,9 +227,10 @@ class ReferralService {
       const referralStats = await Referral.getStats(userId);
       const referrals = await Referral.findByReferrer(userId);
 
+      const appBaseUrl = process.env.APP_URL || 'https://celf-website.vikiflow.com';
       return {
         referralCode: user.referralCode,
-        referralLink: `${process.env.APP_URL || 'https://celf.app'}/signup?ref=${user.referralCode}`,
+        referralLink: `${appBaseUrl}/auth/register?ref=${user.referralCode}`,
         stats: referralStats,
         referrals: referrals.map(ref => ({
           id: ref._id,
