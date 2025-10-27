@@ -3,7 +3,10 @@
  * Handles all admin-specific API communication with the backend
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const RAW_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = RAW_API_BASE_URL.endsWith('/api')
+  ? RAW_API_BASE_URL
+  : `${RAW_API_BASE_URL.replace(/\/+$/, '')}/api`;
 
 export interface AdminStats {
   users: {

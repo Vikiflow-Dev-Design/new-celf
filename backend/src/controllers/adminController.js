@@ -32,8 +32,7 @@ class AdminController {
   async getRecentActivity(req, res, next) {
     try {
       const { limit = 10 } = req.query;
-      // Note: getRecentActivity method needs to be implemented in mongodbService
-      const activities = []; // Placeholder
+      const activities = await mongodbService.getRecentActivity(parseInt(limit));
       res.json(createResponse(true, 'Recent activity retrieved successfully', activities));
     } catch (error) {
       next(error);
